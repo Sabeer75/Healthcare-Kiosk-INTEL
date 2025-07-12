@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kiosk Scanner - Secure Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 25% 25%, #00ff9f 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, #00d4ff 0%, transparent 50%);
+            opacity: 0.05;
+            animation: float 6s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .main-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 255, 159, 0.2);
+            border-radius: 25px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 159, 0.1), transparent);
+            animation: scan 3s infinite;
+        }
+
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .login-section {
+            width: 100%;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-section h2 {
+            color: #00ff9f;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 300;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 20px rgba(0, 255, 159, 0.5);
+        }
+
+        .login-options {
+            display: flex;
+            margin: 30px 0;
+            border-radius: 15px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .login-tab {
+            flex: 1;
+            padding: 15px 20px;
+            cursor: pointer;
+            background: transparent;
+            color: #ffffff;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .login-tab::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, #00ff9f, #00d4ff);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .login-tab.active {
+            background: linear-gradient(135deg, rgba(0, 255, 159, 0.2), rgba(0, 212, 255, 0.2));
+            color: #00ff9f;
+            text-shadow: 0 0 10px rgba(0, 255, 159, 0.5);
+        }
+
+        .login-tab.active::before {
+            transform: scaleX(1);
+        }
+
+        .login-tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+            color: #00d4ff;
+        }
+
+        .login-form {
+            padding: 30px 0;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #00ff9f;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 159, 0.3);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 16px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00ff9f;
+            box-shadow: 0 0 20px rgba(0, 255, 159, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #00ff9f, #00d4ff);
+            color: #000000;
+            border: none;
+            border-radius: 15px;
+            padding: 18px 30px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 18px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(0, 255, 159, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0, 255, 159, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* QR Section with enhanced scanner effect */
+        .qr-section {
+            display: none;
+            width: 100%;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .qr-section.active {
+            display: block;
+        }
+
+        .qr-container {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(0, 255, 159, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px auto;
+            max-width: 350px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .qr-container::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #00ff9f, #00d4ff, #00ff9f);
+            border-radius: 20px;
+            z-index: -1;
+            animation: borderGlow 2s linear infinite;
+        }
+
+        @keyframes borderGlow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+
+        .qr-title {
+            color: #00ff9f;
+            margin-bottom: 25px;
+            font-size: 20px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .qr-img {
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 25px;
+            border: 3px solid rgba(0, 255, 159, 0.5);
+            border-radius: 15px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.95);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .qr-img::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 159, 0.4), transparent);
+            animation: qrScan 2s infinite;
+        }
+
+        @keyframes qrScan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .qr-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* Enhanced button styling */
+        .auth-btn {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #ffffff;
+            border: none;
+            border-radius: 15px;
+            padding: 15px 25px;
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(0, 212, 255, 0.4);
+        }
+
+        .status-message {
+            color: #00ff9f;
+            margin-top: 20px;
+            font-weight: 500;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Enhanced loading spinner */
+        .loading-spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(0, 255, 159, 0.3);
+            border-radius: 50%;
+            border-top-color: #00ff9f;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Forgot password link */
+        .forgot-link {
+            color: #00d4ff;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .forgot-link:hover {
+            color: #00ff9f;
+            text-shadow: 0 0 10px rgba(0, 255, 159, 0.5);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 10px;
+                padding: 25px;
+            }
+            
+            .login-section h2 {
+                font-size: 24px;
+            }
+            
+            .login-tab {
+                padding: 12px 15px;
+                font-size: 14px;
+            }
+            
+            .qr-img {
+                width: 180px;
+                height: 180px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 20px;
+            }
+            
+            .qr-container {
+                padding: 20px;
+            }
+            
+            .qr-img {
+                width: 160px;
+                height: 160px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="login-section">
+            <h2>🔒 Secure Login to the Kiosk</h2>
+            
+            <div class="login-options">
+                <div class="login-tab active" id="credentials-tab" onclick="switchTab('credentials')">
+                    👤 Username & Password
+                </div>
+                <div class="login-tab" id="qr-tab" onclick="switchTab('qr')">
+                    📱 Login with QR
+                </div>
+            </div>
+            
+            <div class="login-form" id="credentials-form">
+                <div class="form-group">
+                    <label for="username">👤 Username</label>
+                    <input type="text" id="username" placeholder="Enter your username">
+                </div>
+                <div class="form-group">
+                    <label for="password">🔐 Password</label>
+                    <input type="password" id="password" placeholder="Enter your password">
+                </div>
+                <button class="submit-btn">🚀 Login</button>
+                <p style="margin-top: 20px; text-align: center;">
+                    <a href="#" class="forgot-link">🔑 Forgot Password?</a>
+                </p>
+            </div>
+            
+            <div class="qr-section" id="qr-login-form">
+                <div class="qr-container">
+                    <h2 class="qr-title">📷 Scan QR Code to Login</h2>
+                    <div class="qr-img">
+                        <!-- QR code will be inserted here by Python backend -->
+                        <img src="data:image/png;base64,{{ qr_img }}" alt="QR Code">
+                    </div>
+                
+                    <!-- Redirect button to IOB App -->
+                    <button class="auth-btn" onclick="window.location.href='iobapp://authenticate?token={{ token }}'">
+                        📱 Authenticate via IOB App
+                    </button>
+                
+                    <p class="status-message">
+                        ⏳ Waiting for mobile confirmation...
+                        <span class="loading-spinner"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Function to switch between login tabs
+        function switchTab(tab) {
+            // Hide all forms
+            document.getElementById('credentials-form').style.display = 'none';
+            document.getElementById('qr-login-form').style.display = 'none';
+            
+            // Remove active class from all tabs
+            document.getElementById('credentials-tab').classList.remove('active');
+            document.getElementById('qr-tab').classList.remove('active');
+            
+            // Show selected form and activate tab
+            if (tab === 'credentials') {
+                document.getElementById('credentials-form').style.display = 'block';
+                document.getElementById('credentials-tab').classList.add('active');
+            } else {
+                document.getElementById('qr-login-form').style.display = 'block';
+                document.getElementById('qr-tab').classList.add('active');
+                // Start the login check when QR tab is activated
+                checkLogin();
+            }
+        }
+        
+        // QR login check function
+        const token = "{{ token }}";
+        const checkLogin = () => {
+            fetch(`/check-login?token=${token}`)
+                .then(res => res.text())
+                .then(status => {
+                    if (status === "LOGGED_IN") {
+                        window.location.href = "/dashboard";
+                    } else {
+                        setTimeout(checkLogin, 2000);  // Poll every 2 sec
+                    }
+                })
+                .catch(err => {
+                    console.error("Error checking login status:", err);
+                    setTimeout(checkLogin, 2000);
+                });
+        };
+        
+        // Initialize with credentials tab active
+        document.getElementById('qr-login-form').style.display = 'none';
+    </script>
+</body>
+</html>
